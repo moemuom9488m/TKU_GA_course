@@ -26,6 +26,21 @@ document.querySelectorAll('a[href^="#"]').forEach(function(a) {
     a.addEventListener('click', function(e) {
         var href = this.getAttribute('href');
         if (href === '#') return;
+
+        // GA4 tracking for navigation clicks
+        var linkText = this.textContent.trim();
+        if (linkText.toLowerCase().indexOf('order now') !== -1) {
+            gtag('event', 'click_order_now', {
+                'link_text': linkText,
+                'link_url': href
+            });
+        } else if (this.classList.contains('nav-link')) {
+            gtag('event', 'nav_click', {
+                'link_text': linkText,
+                'link_url': href
+            });
+        }
+
         var t = document.querySelector(href);
         if (t) {
             e.preventDefault();
@@ -115,6 +130,12 @@ $(document).ready(function() {
 
 
 function filterMenu(cat) {
+    // GA4 tracking: select_content
+    gtag('event', 'select_content', {
+        'content_type': 'menu_category',
+        'item_id': cat
+    });
+
     // sync filter buttons
     document.querySelectorAll('.filtbtn').forEach(function(b) {
         b.classList.toggle('active', b.getAttribute('data-f') === cat);
@@ -204,6 +225,13 @@ function openMenuPop(card) {
             return '<span class="mptag">' + t.trim() + '</span>';
         }).join('');
 
+    // GA4 tracking: view_item
+    gtag('event', 'view_item', {
+        'item_name': title,
+        'item_category': cat,
+        'price': price ? parseFloat(price.replace('$', '')) : 0
+    });
+
     mpQty = 1;
     document.getElementById('mpQnum').textContent = 1;
     document.getElementById('mpAddCart').innerHTML = '<i class="fas fa-shopping-cart"></i> Add to Cart';
@@ -262,6 +290,25 @@ document.getElementById('mpMinus').addEventListener('click', function() {
 document.getElementById('mpAddCart').addEventListener('click', function() {
     var cnt = parseInt(document.getElementById('cartCount').textContent) + mpQty;
     document.getElementById('cartCount').textContent = cnt;
+
+    // GA4 tracking: add_to_cart / click_add_to_cart
+    var title = document.getElementById('mpTitle').textContent;
+    var cat = document.getElementById('mpCat').textContent;
+    var priceText = document.getElementById('mpPrice').textContent || '0';
+    var price = parseFloat(priceText.replace(/[^0-9.]/g, '')) || 0;
+    gtag('event', 'add_to_cart', {
+        'item_name': title,
+        'item_category': cat,
+        'quantity': mpQty,
+        'price': price
+    });
+    gtag('event', 'click_add_to_cart', {
+        'item_name': title,
+        'item_category': cat,
+        'quantity': mpQty,
+        'price': price
+    });
+
     this.innerHTML = '<i class="fas fa-check"></i> Added to Cart!';
     this.style.background = 'linear-gradient(135deg,var(--green),#1a4a35)';
     var self = this;
@@ -275,6 +322,32 @@ document.getElementById('mpAddCart').addEventListener('click', function() {
 
 document.getElementById('resBtn').addEventListener('click', function() {
     var btn = this;
+
+    // Form validation
+    var name = document.getElementById('resName').value.trim();
+    var phone = document.getElementById('resPhone').value.trim();
+    var email = document.getElementById('resEmail').value.trim();
+    var date = document.getElementById('resDate').value.trim();
+    var guests = document.getElementById('resGuests').value;
+    var time = document.getElementById('resTime').value;
+
+    var missingFields = [];
+    if (!name) missingFields.push('Full Name');
+    if (!phone) missingFields.push('Phone Number');
+    if (!email) missingFields.push('Email Address');
+    if (!date) missingFields.push('Date');
+
+    if (missingFields.length > 0) {
+        // GA4 tracking: form_error
+        gtag('event', 'form_error', {
+            'form_name': 'reservation',
+            'error_type': 'missing_fields',
+            'error_details': missingFields.join(', ')
+        });
+        alert('Please fill in the required fields: ' + missingFields.join(', '));
+        return;
+    }
+
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Booking...';
     btn.disabled = true;
     setTimeout(function() {
@@ -282,6 +355,21 @@ document.getElementById('resBtn').addEventListener('click', function() {
         btn.disabled = false;
         var ok = document.getElementById('resOk');
         ok.style.display = 'block';
+
+        // GA4 tracking: generate_lead & click_reservation
+        gtag('event', 'generate_lead', {
+            'form_name': 'reservation',
+            'guests': guests,
+            'date': date,
+            'time': time
+        });
+        gtag('event', 'click_reservation', {
+            'form_name': 'reservation',
+            'guests': guests,
+            'date': date,
+            'time': time
+        });
+
         ok.scrollIntoView({
             behavior: 'smooth',
             block: 'nearest'
@@ -292,6 +380,29 @@ document.getElementById('resBtn').addEventListener('click', function() {
 
 document.getElementById('ctcBtn').addEventListener('click', function() {
     var btn = this;
+
+    // Form validation
+    var name = document.getElementById('ctcName').value.trim();
+    var email = document.getElementById('ctcEmail').value.trim();
+    var subject = document.getElementById('ctcSubject').value;
+    var message = document.getElementById('ctcMessage').value.trim();
+
+    var missingFields = [];
+    if (!name) missingFields.push('Your Name');
+    if (!email) missingFields.push('Email Address');
+    if (!message) missingFields.push('Message');
+
+    if (missingFields.length > 0) {
+        // GA4 tracking: form_error
+        gtag('event', 'form_error', {
+            'form_name': 'contact',
+            'error_type': 'missing_fields',
+            'error_details': missingFields.join(', ')
+        });
+        alert('Please fill in the required fields: ' + missingFields.join(', '));
+        return;
+    }
+
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
     btn.disabled = true;
     setTimeout(function() {
@@ -299,6 +410,13 @@ document.getElementById('ctcBtn').addEventListener('click', function() {
         btn.disabled = false;
         var ok = document.getElementById('ctcOk');
         ok.style.display = 'block';
+
+        // GA4 tracking: contact
+        gtag('event', 'contact', {
+            'form_name': 'contact',
+            'subject': subject
+        });
+
         ok.scrollIntoView({
             behavior: 'smooth',
             block: 'nearest'
@@ -446,4 +564,13 @@ window.addEventListener('scroll', function() {
             }, 1400 / 55);
         });
     }
+});
+
+// GA4 tracking: click_contact_link
+document.querySelectorAll('.contact-link').forEach(function(link) {
+    link.addEventListener('click', function() {
+        gtag('event', 'click_contact_link', {
+            'link_url': this.getAttribute('href')
+        });
+    });
 });
