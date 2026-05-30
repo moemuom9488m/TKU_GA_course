@@ -1,7 +1,13 @@
 # Sarab - 免費快餐與餐廳 HTML 模板
 
-[![Demo](https://img.shields.io/badge/Demo-Live_Preview-orange?style=for-the-badge)](https://themewagon.github.io/sarab/)
+[![Demo](https://img.shields.io/badge/Demo-Live_Preview-orange?style=for-the-badge)](https://moemuom9488m.github.io/TKU_GA_course/sarab/)
 [![Download](https://img.shields.io/badge/Download-ThemeWagon-green?style=for-the-badge)](https://themewagon.com/themes/sarab/)
+
+## 🔗 實作線上網址
+- **線上預覽網站**：[https://moemuom9488m.github.io/TKU_GA_course/sarab/](https://moemuom9488m.github.io/TKU_GA_course/sarab/)
+- **自動生成 Sitemap**：[https://moemuom9488m.github.io/TKU_GA_course/sarab/sitemap.xml](https://moemuom9488m.github.io/TKU_GA_course/sarab/sitemap.xml)
+
+---
 
 **Sarab** 是一款現代、響應式且功能豐富的快餐與餐廳單頁 HTML 網頁模板。它專為快餐店、餐廳、咖啡廳及各類餐飲業設計，擁有精美的視覺特效與直觀的互動設計，能夠完美展示菜單、廚師團隊、顧客評價，並包含預約與聯絡表單的模擬互動。
 
