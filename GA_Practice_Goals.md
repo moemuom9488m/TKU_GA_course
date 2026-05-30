@@ -29,11 +29,11 @@
 - [ ] **2-4. 即時流量驗證（Real-time Test）**
   - 使用伺服器環境瀏覽網頁並在網頁上隨意點擊，確認 GA4 後台的「即時報告」中能即時偵測到您的造訪與 `page_view` 事件。
 - [ ] **2-5. 🚀 部署至 GitHub Pages（實戰線上環境）**
-  - **步驟 1**：進入您的專案網頁 [TKU_GA_course 設定頁面](https://github.com/moemuom9488m/TKU_GA_course/settings/pages)。
+  - **步驟 1**：進入您的專案網頁 `https://github.com/<您的帳號>/<您的倉庫名稱>/settings/pages`。
   - **步驟 2**：在 **Build and deployment** 底下的 **Source** 選擇 `Deploy from a branch`。
   - **步驟 3**：將 **Branch** 選擇 `main` 分支，資料夾選擇 `/ (root)`，並點擊 **Save**。
   - **步驟 4**：等待 1-2 分鐘後重新整理設定頁面，確認看見 `Your site is live at...` 綠色區塊。
-  - **步驟 5**：造訪線上網址並加上子路徑以觀看網頁：`https://moemuom9488m.github.io/TKU_GA_course/sarab/`。
+  - **步驟 5**：造訪線上網址並加上子路徑以觀看網頁：`https://<您的帳號>.github.io/<您的倉庫名稱>/sarab/`。
 
 ---
 
@@ -46,7 +46,7 @@
   - **事件名稱**：`click_order_now` 或 `nav_click`。
 - [ ] **3-2. 追蹤「菜單分類篩選動作」**
   - **目標**：了解顧客最常點擊漢堡、披薩還是甜點等分類。
-  - **實作方式**：在 [main.js](file:///c:/Users/TKU-STAFF/Downloads/sarab-1.0.0/sarab/js/main.js) 的 `.filtbtn` 點擊監聽器中，抓取 `data-f` 屬性值（例如 `burgers`）發送事件。
+  - **實作方式**：在 [sarab/js/main.js](file://./sarab/js/main.js) 的 `.filtbtn` 點擊監聽器中，抓取 `data-f` 屬性值（例如 `burgers`）發送事件。
   - **事件名稱**：`select_content`（包含參數 `content_type: 'menu_category'` 與 `item_id: 分類名稱`）。
 - [ ] **3-3. 追蹤「商品詳情彈窗開啟」**
   - **目標**：當顧客點選某道菜開啟彈窗時進行紀錄。
@@ -90,5 +90,5 @@
 ---
 
 💡 **貼心提醒**：
-* 編輯程式碼時，請使用 [index.html](file:///c:/Users/TKU-STAFF/Downloads/sarab-1.0.0/sarab/index.html) 以及 [main.js](file:///c:/Users/TKU-STAFF/Downloads/sarab-1.0.0/sarab/js/main.js) 來定位並修改。
+* 編輯程式碼時，請使用 [sarab/index.html](file://./sarab/index.html) 以及 [sarab/js/main.js](file://./sarab/js/main.js) 來定位並修改。
 * 修改完成後，記得在 Expression Web 4 按下 `Ctrl + S` 儲存，再到瀏覽器按 `F5` 重新整理，才能順利將事件送出喔！
