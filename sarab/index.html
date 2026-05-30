@@ -6,12 +6,12 @@
    <script async src="https://www.googletagmanager.com/gtag/js?id=G-H8YB1Z4BRP"></script>
    <script>
       window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
+      function gtag() { dataLayer.push(arguments); }
       gtag('js', new Date());
 
       // 初始化 GA4，並加入 localhost 本地端除錯設定
-      gtag('config', 'G-H8YB1Z4BRP', { 
-         'cookie_flags': 'SameSite=None;Secure' 
+      gtag('config', 'G-H8YB1Z4BRP', {
+         'cookie_flags': 'SameSite=None;Secure'
       });
    </script>
    <meta charset="UTF-8">
@@ -93,7 +93,8 @@
                <button id="navSearchBtn" title="Search"><i class="fas fa-search"></i></button>
                <a href="#menu" class="nav-link nav-cta">
                   <i class="fas fa-shopping-bag me-1"></i>Order Now
-                  <span class="badge bg-danger ms-1" id="cartCount" style="font-size: 0.72rem; padding: 0.25em 0.55em; border-radius: 50%;">0</span>
+                  <span class="badge bg-danger ms-1" id="cartCount"
+                     style="font-size: 0.72rem; padding: 0.25em 0.55em; border-radius: 50%;">0</span>
                </a>
             </div>
          </div>
@@ -1206,6 +1207,33 @@
                      <i class="fas fa-check-circle"></i>
                      <p>Message sent! We'll reply within 2 hours.</p>
                   </div>
+               </div>
+            </div>
+         </div>
+      </div>
+   </section>
+
+   <!-- ============================================================
+      VIDEO TEST SECTION
+      ============================================================ -->
+   <section id="video-test" class="py-5" style="background-color: #121619; border-top: 1px solid #222;">
+      <div class="container text-center">
+         <div class="mb-4" data-aos="fade-up">
+            <span class="slbl">測試區塊</span>
+            <h2 class="stitle">影片嵌入 <span>測試</span></h2>
+            <div class="sline"></div>
+         </div>
+         <div class="row justify-content-center" data-aos="zoom-in">
+            <div class="col-lg-10">
+               <div class="ratio ratio-16x9 shadow-lg rounded" style="overflow: hidden; border: 3px solid #222;">
+                  <iframe 
+                     src="https://www.youtube.com/embed/kFxuDAajkB4?enablejsapi=1" 
+                     title="在公車上隨機搭訕！讓乘客推薦美食！挑戰307從頭吃到尾！《公車食刻表》ep1【Joeman】" 
+                     frameborder="0" 
+                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                     referrerpolicy="strict-origin-when-cross-origin" 
+                     allowfullscreen>
+                  </iframe>
                </div>
             </div>
          </div>
