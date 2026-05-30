@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://moemuom9488m.github.io/TKU_GA_course/sarab/sitemap.xml
