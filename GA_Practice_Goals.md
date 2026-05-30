@@ -28,6 +28,12 @@
   - **實作方法**：請利用 Expression Web 4 內建的 Development Server 預覽功能（網址通常為 `http://localhost:XXXX`），或者將專案部署至 GitHub Pages 等靜態託管平台。必須確保網址開頭是 `http://` 或 `https://`，GA4 才能正確運作。
 - [ ] **2-4. 即時流量驗證（Real-time Test）**
   - 使用伺服器環境瀏覽網頁並在網頁上隨意點擊，確認 GA4 後台的「即時報告」中能即時偵測到您的造訪與 `page_view` 事件。
+- [ ] **2-5. 🚀 部署至 GitHub Pages（實戰線上環境）**
+  - **步驟 1**：進入您的專案網頁 [TKU_GA_course 設定頁面](https://github.com/moemuom9488m/TKU_GA_course/settings/pages)。
+  - **步驟 2**：在 **Build and deployment** 底下的 **Source** 選擇 `Deploy from a branch`。
+  - **步驟 3**：將 **Branch** 選擇 `main` 分支，資料夾選擇 `/ (root)`，並點擊 **Save**。
+  - **步驟 4**：等待 1-2 分鐘後重新整理設定頁面，確認看見 `Your site is live at...` 綠色區塊。
+  - **步驟 5**：造訪線上網址並加上子路徑以觀看網頁：`https://moemuom9488m.github.io/TKU_GA_course/sarab/`。
 
 ---
 
