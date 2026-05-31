@@ -18,7 +18,8 @@
 ```text
 sarab-1.0.0/
 ├── sarab/                      # 模板主專案資料夾
-│   ├── index.html              # 首頁（主 HTML 檔案）
+│   ├── index.html              # 首頁（已串接結帳頁與封閉式建議搜尋）
+│   ├── checkout.html           # [NEW] 結帳中心頁面（含購物車清單、收件表單與資料庫連線）
 │   ├── css/                    # 樣式表資料夾
 │   │   ├── style.css           # 自訂主樣式表 (含自訂變數)
 │   │   ├── bootstrap.min.css   # Bootstrap 5.3 框架
@@ -27,7 +28,7 @@ sarab-1.0.0/
 │   │   ├── magnific-popup.css  # 影片彈窗樣式
 │   │   └── all.min.css         # FontAwesome 圖標字型樣式
 │   ├── js/                     # 腳本資料夾
-│   │   ├── main.js             # 專案自訂邏輯與互動行為
+│   │   ├── main.js             # 專案自訂邏輯（含購物車 LocalStorage 運作與搜尋自動完成邏輯）
 │   │   ├── jquery-3.7.1.min.js  # jQuery 核心庫
 │   │   ├── bootstrap.bundle.min.js # Bootstrap 5 JS 套件
 │   │   ├── aos.js              # 捲動動畫套件
@@ -40,7 +41,9 @@ sarab-1.0.0/
 │   ├── css/
 │   ├── fonts/
 │   └── js/
-└── README.md                   # 本專案說明（中文版）
+├── robots.txt                  # 搜尋引擎爬蟲規範
+├── GEMINI.md                   # 本專案開發與串接詳細文件 [NEW]
+└── README.md                   # 本專案說明（中文版，已更新）
 ```
 
 ---
@@ -57,6 +60,10 @@ sarab-1.0.0/
 - **預約與聯絡表單 (Reservation & Contact Forms)**：表單點擊提交時會顯示載入動畫（Loading Spinner），模擬與後端的串接過程。
 - **自訂燈箱藝廊 (Custom Gallery Popup)**：精美的食物展示牆，點擊可開啟全螢幕大圖並支援上一張/下一張切換。
 - **訂閱電子報 (Newsletter)**：底部提供訂閱電子報功能，模擬成功訂閱提示。
+- **進階結帳中心與購物車持久化 (Checkout & Cart Persistence)** 🌟：使用 LocalStorage 保存購物清單，新增獨立結帳頁面 `checkout.html`，具備流暢的訂單處理動畫、防錯欄位驗證、付款方式切換等真實電商操作感。
+- **Google Sheets 資料庫整合 (Google Sheets DB)** 🌟：顧客結帳後，訂單的聯絡資料、商品明細與總金額會透過 Google Apps Script Web App 即時且自動寫入雲端 Google 試算表，達成完整的營運管理。
+- **Autocomplete 搜尋建議與網址參數** 🌟：主頁搜尋框支援本機菜單關鍵字比對、質感的模糊匹配下拉選單（點選一鍵搜尋與滾動定位）。搜尋時網址列同步更新為 `?q=關鍵字`，且支援直接造訪特定產品連結（深度連結）。
+- **完整 E-commerce GA4 事件追蹤** 🌟：支援 `begin_checkout`、`purchase` (購買轉換) 及 `view_search_results` (站內搜尋) 事件。
 
 ---
 
