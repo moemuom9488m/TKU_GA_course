@@ -1,3 +1,41 @@
+/* --- CART PERSISTENCE HELPERS --- */
+function getCart() {
+    try {
+        var cart = localStorage.getItem('sarab_cart');
+        return cart ? JSON.parse(cart) : [];
+    } catch (e) {
+        console.error("Error parsing cart", e);
+        return [];
+    }
+}
+
+function saveCart(cart) {
+    try {
+        localStorage.setItem('sarab_cart', JSON.stringify(cart));
+    } catch (e) {
+        console.error("Error saving cart", e);
+    }
+}
+
+function updateCartBadge() {
+    var cart = getCart();
+    var count = 0;
+    for (var i = 0; i < cart.length; i++) {
+        count += cart[i].quantity;
+    }
+    var badge = document.getElementById('cartCount');
+    if (badge) {
+        badge.textContent = count;
+    }
+    var badgeFl = document.getElementById('cartCountFl');
+    if (badgeFl) {
+        badgeFl.textContent = count;
+    }
+}
+
+// Initial badge load
+updateCartBadge();
+
 AOS.init({
     duration: 680,
     once: true,
@@ -288,14 +326,36 @@ document.getElementById('mpMinus').addEventListener('click', function() {
 
 // Add to cart button
 document.getElementById('mpAddCart').addEventListener('click', function() {
-    var cnt = parseInt(document.getElementById('cartCount').textContent) + mpQty;
-    document.getElementById('cartCount').textContent = cnt;
-
-    // GA4 tracking: add_to_cart / click_add_to_cart
+    // Get item data
     var title = document.getElementById('mpTitle').textContent;
     var cat = document.getElementById('mpCat').textContent;
     var priceText = document.getElementById('mpPrice').textContent || '0';
     var price = parseFloat(priceText.replace(/[^0-9.]/g, '')) || 0;
+    var img = document.getElementById('mpImg').getAttribute('src') || '';
+
+    // Add to localStorage cart
+    var cart = getCart();
+    var found = false;
+    for (var i = 0; i < cart.length; i++) {
+        if (cart[i].title === title) {
+            cart[i].quantity += mpQty;
+            found = true;
+            break;
+        }
+    }
+    if (!found) {
+        cart.push({
+            title: title,
+            category: cat,
+            price: price,
+            img: img,
+            quantity: mpQty
+        });
+    }
+    saveCart(cart);
+    updateCartBadge();
+
+    // GA4 tracking: add_to_cart / click_add_to_cart
     gtag('event', 'add_to_cart', {
         'item_name': title,
         'item_category': cat,

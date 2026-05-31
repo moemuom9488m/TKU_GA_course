@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="zh-tw">
+
+<head>
+   <!-- Google tag (gtag.js) -->
+   <script async src="https://www.googletagmanager.com/gtag/js?id=G-H8YB1Z4BRP"></script>
+   <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() { dataLayer.push(arguments); }
+      gtag('js', new Date());
+
+      // 初始化 GA4，並加入 localhost 本地端除錯設定
+      gtag('config', 'G-H8YB1Z4BRP', {
+         'cookie_flags': 'SameSite=None;Secure'
+      });
+   </script>
+   <meta charset="UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1">
+   <meta name="author" content="Sarab">
+   <meta name="description" content="Checkout - Sarab Fast Food & Restaurant">
+   <title>結帳中心 - 伊布的沙拉霸</title>
+   <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Poppins:wght@300;400;500;600;700&family=Dancing+Script:wght@700&display=swap"
+      rel="stylesheet" />
+   <!-- Bootstrap 5.3 -->
+   <link href="css/bootstrap.min.css" rel="stylesheet" />
+   <!-- AOS Animate on Scroll -->
+   <link href="css/aos.css" rel="stylesheet" />
+   <!-- all min css -->
+   <link rel="stylesheet" href="css/all.min.css" />
+   <!-- Style CSS -->
+   <link rel="stylesheet" href="css/style.css" />
+   <style>
+      body {
+         background-color: var(--light);
+         font-family: 'Poppins', 'Microsoft JhengHei', sans-serif;
+         color: var(--dark);
+      }
+
+      .checkout-section {
+         padding-top: 130px;
+         padding-bottom: 80px;
+         min-height: 85vh;
+      }
+
+      .checkout-card {
+         background: #ffffff;
+         border-radius: 16px;
+         box-shadow: var(--shadow);
+         border: 1px solid rgba(0, 0, 0, 0.05);
+         padding: 30px;
+         margin-bottom: 24px;
+         transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      .checkout-card:hover {
+         box-shadow: var(--shadow-lg);
+      }
+
+      .checkout-card-title {
+         font-size: 1.25rem;
+         font-weight: 700;
+         margin-bottom: 20px;
+         color: var(--dark);
+         border-bottom: 2px solid var(--primary);
+         padding-bottom: 8px;
+         display: inline-block;
+      }
+
+      .cart-item {
+         display: flex;
+         align-items: center;
+         padding: 15px 0;
+         border-bottom: 1px dashed #eee;
+      }
+
+      .cart-item:last-child {
+         border-bottom: none;
+      }
+
+      .cart-item-img {
+         width: 64px;
+         height: 64px;
+         border-radius: 8px;
+         object-fit: cover;
+         margin-right: 15px;
+         box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+      }
+
+      .cart-item-info {
+         flex-grow: 1;
+      }
+
+      .cart-item-title {
+         font-size: 0.95rem;
+         font-weight: 600;
+         margin-bottom: 4px;
+      }
+
+      .cart-item-price {
+         color: var(--primary);
+         font-weight: 700;
+         font-size: 0.9rem;
+      }
+
+      .cart-item-qty-control {
+         display: flex;
+         align-items: center;
+         gap: 8px;
+         margin-left: 15px;
+      }
+
+      .cart-qty-btn {
+         width: 26px;
+         height: 26px;
+         border-radius: 50%;
+         border: 1px solid #ccc;
+         background: #fff;
+         font-size: 0.85rem;
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         cursor: pointer;
+         transition: all 0.2s;
+      }
+
+      .cart-qty-btn:hover {
+         background: var(--primary);
+         color: #fff;
+         border-color: var(--primary);
+      }
+
+      .cart-qty-num {
+         font-weight: 600;
+         font-size: 0.9rem;
+         min-width: 20px;
+         text-align: center;
+      }
+
+      .cart-item-delete {
+         color: #aaa;
+         cursor: pointer;
+         margin-left: 15px;
+         transition: color 0.2s;
+      }
+
+      .cart-item-delete:hover {
+         color: var(--primary);
+      }
+
+      .summary-row {
+         display: flex;
+         justify-content: space-between;
+         margin-bottom: 12px;
+         font-size: 0.95rem;
+      }
+
+      .summary-total {
+         font-size: 1.2rem;
+         font-weight: 700;
+         color: var(--primary);
+         border-top: 1px solid #eee;
+         padding-top: 15px;
+         margin-top: 15px;
+      }
+
+      /* Payment options */
+      .payment-option {
+         border: 2px solid #eee;
+         border-radius: 10px;
+         padding: 15px;
+         cursor: pointer;
+         display: flex;
+         align-items: center;
+         gap: 10px;
+         transition: all 0.3s;
+         margin-bottom: 12px;
+      }
+
+      .payment-option:hover {
+         border-color: var(--secondary);
+      }
+
+      .payment-option.active {
+         border-color: var(--primary);
+         background: rgba(232, 40, 26, 0.03);
+      }
+
+      .payment-option input {
+         display: none;
+      }
+
+      .payment-option i {
+         font-size: 1.25rem;
+         color: #555;
+      }
+
+      .payment-option.active i {
+         color: var(--primary);
+      }
+
+      /* Fullscreen overlays */
+      .overlay-screen {
+         position: fixed;
+         top: 0;
+         left: 0;
+         width: 100%;
+         height: 100%;
+         background: rgba(10, 13, 15, 0.95);
+         z-index: 9999;
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         color: #fff;
+         opacity: 0;
+         pointer-events: none;
+         transition: opacity 0.4s ease;
+      }
+
+      .overlay-screen.active {
+         opacity: 1;
+         pointer-events: auto;
+      }
+
+      .spinner-box {
+         text-align: center;
+      }
+
+      .custom-spinner {
+         width: 60px;
+         height: 60px;
+         border: 5px solid rgba(255,255,255,0.1);
+         border-radius: 50%;
+         border-left-color: var(--primary);
+         animation: spin 1s linear infinite;
+         margin: 0 auto 20px;
+      }
+
+      @keyframes spin {
+         0% { transform: rotate(0deg); }
+         100% { transform: rotate(360deg); }
+      }
+
+      .loading-step-text {
+         font-size: 1.15rem;
+         font-weight: 500;
+         letter-spacing: 1px;
+         animation: pulse 1.5s infinite;
+      }
+
+      @keyframes pulse {
+         0%, 100% { opacity: 0.6; }
+         50% { opacity: 1; }
+      }
+
+      .success-box {
+         background: #1a1a1a;
+         border-radius: 20px;
+         padding: 40px;
+         max-width: 550px;
+         width: 90%;
+         text-align: center;
+         box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+         border: 1px solid rgba(255,255,255,0.05);
+         transform: scale(0.8);
+         transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      }
+
+      .overlay-screen.active .success-box {
+         transform: scale(1);
+      }
+
+      .success-icon-wrap {
+         width: 80px;
+         height: 80px;
+         background: rgba(74, 222, 128, 0.15);
+         border-radius: 50%;
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         margin: 0 auto 24px;
+         color: #4ade80;
+         font-size: 3rem;
+         animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      }
+
+      @keyframes popIn {
+         0% { transform: scale(0); opacity: 0; }
+         100% { transform: scale(1); opacity: 1; }
+      }
+
+      .receipt-card {
+         background: #262626;
+         border-radius: 12px;
+         padding: 20px;
+         text-align: left;
+         margin: 20px 0;
+         font-size: 0.9rem;
+         border-left: 4px solid var(--primary);
+      }
+
+      .receipt-item {
+         display: flex;
+         justify-content: space-between;
+         margin-bottom: 8px;
+         color: #ccc;
+      }
+
+      .receipt-total {
+         border-top: 1px solid #444;
+         padding-top: 8px;
+         margin-top: 8px;
+         font-weight: 700;
+         color: #fff;
+         display: flex;
+         justify-content: space-between;
+      }
+
+      /* Form tweaks */
+      .fctrl-dark {
+         background: #fafafa !important;
+         border-color: #e5e5e5 !important;
+      }
+
+      .empty-cart-view {
+         text-align: center;
+         padding: 50px 20px;
+      }
+
+      .empty-cart-icon {
+         font-size: 4rem;
+         color: #ccc;
+         margin-bottom: 20px;
+      }
+   </style>
+</head>
+
+<body>
+   <!-- ============================================================
+         NAVBAR
+         ============================================================ -->
+   <nav class="navbar navbar-expand-lg scrolled" id="nav" style="background: rgba(10, 13, 15, 0.98); box-shadow: 0 4px 30px rgba(0, 0, 0, 0.15); backdrop-filter: blur(10px); border-bottom: 1px solid #222;">
+      <div class="container">
+         <a class="navbar-brand" href="index.html">
+            <div class="blogo">
+               <div class="bico"><i class="fas fa-utensils"></i></div>
+               <div>
+                  <div class="bname">Sar<span>ab</span></div>
+                  <div class="bsub">Fast Food & Restaurant</div>
+               </div>
+            </div>
+         </a>
+         <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navmenu">
+            <i class="fas fa-bars" style="color:var(--primary);font-size:1.35rem;"></i>
+         </button>
+         <div class="collapse navbar-collapse" id="navmenu">
+            <ul class="navbar-nav mx-auto">
+               <li class="nav-item"><a class="nav-link" href="index.html#hero">Home</a></li>
+               <li class="nav-item"><a class="nav-link" href="index.html#about">About</a></li>
+               <li class="nav-item"><a class="nav-link" href="index.html#menu">Menu</a></li>
+               <li class="nav-item"><a class="nav-link" href="index.html#chefs">Chefs</a></li>
+               <li class="nav-item"><a class="nav-link" href="index.html#reservation">Reservation</a></li>
+               <li class="nav-item"><a class="nav-link" href="index.html#testimonials">Reviews</a></li>
+               <li class="nav-item"><a class="nav-link" href="index.html#contact-section">Contact</a></li>
+            </ul>
+            <div class="d-flex align-items-center gap-1">
+               <a href="checkout.html" class="nav-link nav-cta active">
+                  <i class="fas fa-shopping-bag me-1"></i>Order Now
+                  <span class="badge bg-danger ms-1" id="cartCount"
+                     style="font-size: 0.72rem; padding: 0.25em 0.55em; border-radius: 50%;">0</span>
+               </a>
+            </div>
+         </div>
+      </div>
+   </nav>
+
+   <!-- ============================================================
+         CHECKOUT SECTION
+         ============================================================ -->
+   <section class="checkout-section">
+      <div class="container">
+         <div class="row g-4" id="checkoutLayout">
+            <!-- Left Side: Billing Form -->
+            <div class="col-lg-7" data-aos="fade-right">
+               <div class="checkout-card">
+                  <h3 class="checkout-card-title"><i class="fas fa-shipping-fast me-2"></i>Delivery Details</h3>
+                  <form id="checkoutForm">
+                     <div class="row g-3">
+                        <div class="col-sm-6">
+                           <label class="flbl">Full Name *</label>
+                           <input type="text" id="billingName" class="fctrl fctrl-dark" placeholder="John Doe" required />
+                        </div>
+                        <div class="col-sm-6">
+                           <label class="flbl">Phone Number *</label>
+                           <input type="tel" id="billingPhone" class="fctrl fctrl-dark" placeholder="+1 (800) 123-4567" required />
+                        </div>
+                        <div class="col-12">
+                           <label class="flbl">Email Address *</label>
+                           <input type="email" id="billingEmail" class="fctrl fctrl-dark" placeholder="you@email.com" required />
+                        </div>
+                        <div class="col-12">
+                           <label class="flbl">Delivery Address *</label>
+                           <input type="text" id="billingAddress" class="fctrl fctrl-dark" placeholder="Apartment, Street Address, City, State" required />
+                        </div>
+                        <div class="col-12">
+                           <label class="flbl">Special Delivery Instructions</label>
+                           <textarea id="billingNotes" class="fctrl fctrl-dark" rows="2" placeholder="e.g. Ring the doorbell, Leave at the gate..."></textarea>
+                        </div>
+                     </div>
+
+                     <h3 class="checkout-card-title mt-4"><i class="fas fa-credit-card me-2"></i>Payment Method</h3>
+                     <div class="row">
+                        <div class="col-sm-6">
+                           <div class="payment-option active" onclick="setPaymentMethod('cod')">
+                              <input type="radio" name="paymentMethod" id="payCod" value="cod" checked>
+                              <i class="fas fa-hand-holding-usd"></i>
+                              <span>Cash on Delivery</span>
+                           </div>
+                        </div>
+                        <div class="col-sm-6">
+                           <div class="payment-option" onclick="setPaymentMethod('card')">
+                              <input type="radio" name="paymentMethod" id="payCard" value="card">
+                              <i class="far fa-credit-card"></i>
+                              <span>Credit / Debit Card</span>
+                           </div>
+                        </div>
+                     </div>
+
+                     <!-- Simulated Card inputs (collapsed by default) -->
+                     <div id="cardDetails" class="row g-3 mt-1" style="display: none;">
+                        <div class="col-12">
+                           <label class="flbl">Card Number *</label>
+                           <input type="text" id="cardNumber" class="fctrl fctrl-dark" placeholder="4111 2222 3333 4444" />
+                        </div>
+                        <div class="col-sm-6">
+                           <label class="flbl">Expiry Date *</label>
+                           <input type="text" id="cardExpiry" class="fctrl fctrl-dark" placeholder="MM/YY" />
+                        </div>
+                        <div class="col-sm-6">
+                           <label class="flbl">CVV *</label>
+                           <input type="text" id="cardCvv" class="fctrl fctrl-dark" placeholder="123" />
+                        </div>
+                     </div>
+
+                     <button type="submit" class="btn-red w-100 justify-content-center mt-4" style="height: 52px; font-size: 1.05rem;">
+                        <i class="fas fa-lock me-2"></i>Place Secure Order
+                     </button>
+                  </form>
+               </div>
+            </div>
+
+            <!-- Right Side: Order Summary -->
+            <div class="col-lg-5" data-aos="fade-left">
+               <div class="checkout-card">
+                  <h3 class="checkout-card-title"><i class="fas fa-shopping-cart me-2"></i>Your Order</h3>
+                  <div id="cartItemsList">
+                     <!-- Dynamic items list -->
+                  </div>
+
+                  <div class="mt-4">
+                     <div class="summary-row">
+                        <span>Subtotal</span>
+                        <span id="summarySubtotal">$0.00</span>
+                     </div>
+                     <div class="summary-row">
+                        <span>Delivery Charge</span>
+                        <span id="summaryShipping">$0.00</span>
+                     </div>
+                     <div class="summary-row">
+                        <span>Tax (8%)</span>
+                        <span id="summaryTax">$0.00</span>
+                     </div>
+                     <div class="summary-row summary-total">
+                        <span>Total Amount</span>
+                        <span id="summaryTotal">$0.00</span>
+                     </div>
+                  </div>
+               </div>
+               <div class="text-center">
+                  <a href="index.html#menu" style="color: var(--dark); text-decoration: none; font-size: 0.9rem; font-weight: 500;">
+                     <i class="fas fa-arrow-left me-2"></i>Back to Menu
+                  </a>
+               </div>
+            </div>
+         </div>
+
+         <!-- Empty Cart View -->
+         <div class="row justify-content-center" id="emptyCartView" style="display: none;">
+            <div class="col-md-6" data-aos="zoom-in">
+               <div class="checkout-card empty-cart-view">
+                  <i class="fas fa-shopping-basket empty-cart-icon"></i>
+                  <h3>Your Cart is Empty</h3>
+                  <p class="text-muted mb-4">Add some delicious dishes from our menu to start your order!</p>
+                  <a href="index.html#menu" class="btn-red d-inline-flex align-items-center">
+                     <i class="fas fa-utensils me-2"></i>Browse Our Menu
+                  </a>
+               </div>
+            </div>
+         </div>
+      </div>
+   </section>
+
+   <!-- ============================================================
+         FOOTER
+         ============================================================ -->
+   <footer style="background-color: var(--dark); color: #fff; padding: 40px 0 20px;">
+      <div class="container text-center">
+         <div class="fnm">Sar<span>ab</span></div>
+         <p style="color: rgba(255,255,255,0.6); max-width: 500px; margin: 15px auto;">Every meal is an adventure worth savoring. Hand-crafted with premium local ingredients.</p>
+         <hr style="border-color: #333; margin: 25px 0;">
+         <p class="mb-0" style="color: rgba(255,255,255,0.4); font-size: 0.82rem;">&copy 2026 Sarab Restaurant. All Rights Reserved.</p>
+      </div>
+   </footer>
+
+   <!-- ============================================================
+         SIMULATOR OVERLAYS
+         ============================================================ -->
+   <!-- 1. Loading Simulator -->
+   <div class="overlay-screen" id="loadingOverlay">
+      <div class="spinner-box">
+         <div class="custom-spinner"></div>
+         <p class="loading-step-text" id="loadingText">Connecting to secure billing gateway...</p>
+      </div>
+   </div>
+
+   <!-- 2. Success Simulator -->
+   <div class="overlay-screen" id="successOverlay">
+      <div class="success-box">
+         <div class="success-icon-wrap">
+            <i class="fas fa-check"></i>
+         </div>
+         <h2 style="color: #fff; font-weight: 700; margin-bottom: 8px;">Order Confirmed!</h2>
+         <p style="color: #88ffcc; font-size: 0.95rem; font-weight: 500;"><i class="fas fa-utensils me-1"></i> Your meal is being prepared with fresh ingredients</p>
+         
+         <div class="receipt-card">
+            <div class="receipt-item">
+               <span>Order ID:</span>
+               <strong id="receiptOrderId">#S-782390</strong>
+            </div>
+            <div class="receipt-item">
+               <span>Delivery Target:</span>
+               <strong>42 Flavor Street, NY</strong>
+            </div>
+            <div class="receipt-item">
+               <span>Estimated Delivery:</span>
+               <strong style="color: var(--secondary);"><i class="fas fa-clock me-1"></i> 20-25 mins</strong>
+            </div>
+            <div class="receipt-item">
+               <span>Payment Method:</span>
+               <strong id="receiptPayment">Cash on Delivery</strong>
+            </div>
+            <div class="receipt-total">
+               <span>Total Paid</span>
+               <span id="receiptTotal">$0.00</span>
+            </div>
+         </div>
+
+         <p style="color: #aaa; font-size: 0.85rem; margin-bottom: 24px;">A receipt has been sent to your email address. Thank you for ordering from Sarab!</p>
+         <button onclick="clearAndGoHome()" class="btn-red w-100 justify-content-center" style="height: 48px;">
+            <i class="fas fa-home me-2"></i>Back to Homepage
+         </button>
+      </div>
+   </div>
+
+   <!-- jQuery -->
+   <script src="js/jquery-3.7.1.min.js"></script>
+   <!-- Bootstrap 5 -->
+   <script src="js/bootstrap.bundle.min.js"></script>
+   <!-- AOS -->
+   <script src="js/aos.js"></script>
+   <script>
+      AOS.init({
+         duration: 680,
+         once: true
+      });
+
+      // Cart helpers
+      function getCart() {
+         try {
+            var cart = localStorage.getItem('sarab_cart');
+            return cart ? JSON.parse(cart) : [];
+         } catch (e) {
+            console.error(e);
+            return [];
+         }
+      }
+
+      function saveCart(cart) {
+         try {
+            localStorage.setItem('sarab_cart', JSON.stringify(cart));
+         } catch (e) {
+            console.error(e);
+         }
+      }
+
+      function updateCartBadge() {
+         var cart = getCart();
+         var count = 0;
+         for (var i = 0; i < cart.length; i++) {
+            count += cart[i].quantity;
+         }
+         var badge = document.getElementById('cartCount');
+         if (badge) badge.textContent = count;
+      }
+
+      // Checkout implementation
+      var currentPaymentMethod = 'cod';
+      var computedTotal = 0;
+      var computedShipping = 0;
+      var computedTax = 0;
+      var computedSubtotal = 0;
+
+      function setPaymentMethod(method) {
+         currentPaymentMethod = method;
+         document.querySelectorAll('.payment-option').forEach(function(opt) {
+            opt.classList.remove('active');
+         });
+         
+         if (method === 'cod') {
+            document.getElementById('payCod').checked = true;
+            document.querySelector('.payment-option:nth-of-type(1)').classList.add('active');
+            document.getElementById('cardDetails').style.display = 'none';
+            document.getElementById('cardNumber').required = false;
+            document.getElementById('cardExpiry').required = false;
+            document.getElementById('cardCvv').required = false;
+         } else {
+            document.getElementById('payCard').checked = true;
+            document.querySelector('.payment-option:nth-of-type(2)').classList.add('active');
+            document.getElementById('cardDetails').style.display = 'flex';
+            document.getElementById('cardNumber').required = true;
+            document.getElementById('cardExpiry').required = true;
+            document.getElementById('cardCvv').required = true;
+         }
+      }
+
+      function renderCart() {
+         var cart = getCart();
+         var container = document.getElementById('cartItemsList');
+         
+         if (cart.length === 0) {
+            document.getElementById('checkoutLayout').style.display = 'none';
+            document.getElementById('emptyCartView').style.display = 'flex';
+            return;
+         }
+         
+         document.getElementById('checkoutLayout').style.display = 'flex';
+         document.getElementById('emptyCartView').style.display = 'none';
+         
+         container.innerHTML = '';
+         var subtotal = 0;
+         
+         cart.forEach(function(item, index) {
+            subtotal += item.price * item.quantity;
+            
+            var itemHtml = `
+               <div class="cart-item">
+                  <img src="${item.img || 'img/menu/1.jpg'}" alt="${item.title}" class="cart-item-img">
+                  <div class="cart-item-info">
+                     <div class="cart-item-title">${item.title}</div>
+                     <div class="cart-item-price">$${item.price.toFixed(2)}</div>
+                  </div>
+                  <div class="cart-item-qty-control">
+                     <button class="cart-qty-btn" onclick="updateQty(${index}, -1)">-</button>
+                     <span class="cart-qty-num">${item.quantity}</span>
+                     <button class="cart-qty-btn" onclick="updateQty(${index}, 1)">+</button>
+                  </div>
+                  <div class="cart-item-delete" onclick="removeItem(${index})">
+                     <i class="far fa-trash-alt"></i>
+                  </div>
+               </div>
+            `;
+            container.innerHTML += itemHtml;
+         });
+         
+         // Update Summary values
+         // Free shipping over $30, else $5
+         var shipping = subtotal > 30 ? 0 : 5.00;
+         var tax = subtotal * 0.08;
+         var total = subtotal + shipping + tax;
+         
+         computedSubtotal = subtotal;
+         computedShipping = shipping;
+         computedTax = tax;
+         computedTotal = total;
+         
+         document.getElementById('summarySubtotal').textContent = `$${subtotal.toFixed(2)}`;
+         document.getElementById('summaryShipping').textContent = shipping === 0 ? 'FREE' : `$${shipping.toFixed(2)}`;
+         document.getElementById('summaryTax').textContent = `$${tax.toFixed(2)}`;
+         document.getElementById('summaryTotal').textContent = `$${total.toFixed(2)}`;
+      }
+
+      function updateQty(index, change) {
+         var cart = getCart();
+         if (index >= 0 && index < cart.length) {
+            cart[index].quantity += change;
+            if (cart[index].quantity <= 0) {
+               cart.splice(index, 1);
+            }
+            saveCart(cart);
+            renderCart();
+            updateCartBadge();
+         }
+      }
+
+      function removeItem(index) {
+         var cart = getCart();
+         if (index >= 0 && index < cart.length) {
+            cart.splice(index, 1);
+            saveCart(cart);
+            renderCart();
+            updateCartBadge();
+         }
+      }
+
+      // Page load setup
+      document.addEventListener('DOMContentLoaded', function() {
+         updateCartBadge();
+         renderCart();
+         
+         // GA4 tracking: begin_checkout
+         var cart = getCart();
+         if (cart.length > 0) {
+            var total = 0;
+            var items = cart.map(function(item) {
+               total += item.price * item.quantity;
+               return {
+                  item_name: item.title,
+                  item_id: item.title,
+                  price: item.price,
+                  item_category: item.category || 'Food',
+                  quantity: item.quantity
+               };
+            });
+            gtag('event', 'begin_checkout', {
+               currency: 'USD',
+               value: parseFloat((total + (total > 30 ? 0 : 5) + total * 0.08).toFixed(2)),
+               items: items
+            });
+         }
+         
+         // Setup Form submission
+         document.getElementById('checkoutForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Standard validation
+            var name = document.getElementById('billingName').value.trim();
+            var phone = document.getElementById('billingPhone').value.trim();
+            var email = document.getElementById('billingEmail').value.trim();
+            var address = document.getElementById('billingAddress').value.trim();
+            
+            if (!name || !phone || !email || !address) {
+               alert('Please fill in all required fields.');
+               return;
+            }
+            
+            // Start simulated billing animation
+            var loadingOverlay = document.getElementById('loadingOverlay');
+            var loadingText = document.getElementById('loadingText');
+            
+            loadingOverlay.classList.add('active');
+            
+            // Step-by-step text changes to make it look active!
+            var steps = [
+               "Securing end-to-end payment tunnel...",
+               "Verifying billing authorization...",
+               "Transmitting order details to kitchen...",
+               "Registering secure order ID..."
+            ];
+            
+            var stepIdx = 0;
+            var interval = setInterval(function() {
+               if (stepIdx < steps.length) {
+                  loadingText.textContent = steps[stepIdx++];
+               } else {
+                  clearInterval(interval);
+                  triggerSuccess();
+               }
+            }, 600);
+         });
+      });
+
+      function triggerSuccess() {
+         // Create a simulated order ID
+         var orderId = 'S-' + Math.floor(Math.random() * 900000 + 100000);
+         var address = document.getElementById('billingAddress').value.trim();
+         
+         // Update receipt details
+         document.getElementById('receiptOrderId').textContent = '#' + orderId;
+         document.getElementById('receiptTotal').textContent = `$${computedTotal.toFixed(2)}`;
+         document.getElementById('receiptPayment').textContent = currentPaymentMethod === 'cod' ? 'Cash on Delivery' : 'Credit Card (Simulated)';
+         
+         // Hide loader and show success
+         document.getElementById('loadingOverlay').classList.remove('active');
+         document.getElementById('successOverlay').classList.add('active');
+         
+         // GA4 tracking: purchase
+         var cart = getCart();
+         var items = cart.map(function(item) {
+            return {
+               item_name: item.title,
+               item_id: item.title,
+               price: item.price,
+               item_category: item.category || 'Food',
+               quantity: item.quantity
+            };
+         });
+         
+         gtag('event', 'purchase', {
+            transaction_id: orderId,
+            value: parseFloat(computedTotal.toFixed(2)),
+            currency: 'USD',
+            shipping: parseFloat(computedShipping.toFixed(2)),
+            tax: parseFloat(computedTax.toFixed(2)),
+            items: items
+         });
+      }
+
+      function clearAndGoHome() {
+         localStorage.removeItem('sarab_cart');
+         window.location.href = 'index.html';
+      }
+   </script>
+</body>
+
+</html>
