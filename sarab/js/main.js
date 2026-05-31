@@ -165,6 +165,26 @@ function performSearch(query) {
     }
     window.history.pushState({ path: newUrl }, '', newUrl);
 
+    // Backup original text on first search
+    document.querySelectorAll('.mcard').forEach(function(card) {
+        var titEl = card.querySelector('.mtit');
+        var descEl = card.querySelector('.mdesc');
+        if (titEl && !titEl.dataset.orgText) {
+            titEl.dataset.orgText = titEl.innerHTML;
+        }
+        if (descEl && !descEl.dataset.orgText) {
+            descEl.dataset.orgText = descEl.innerHTML;
+        }
+    });
+
+    // Restore original text first (remove previous highlights)
+    document.querySelectorAll('.mcard').forEach(function(card) {
+        var titEl = card.querySelector('.mtit');
+        var descEl = card.querySelector('.mdesc');
+        if (titEl && titEl.dataset.orgText) titEl.innerHTML = titEl.dataset.orgText;
+        if (descEl && descEl.dataset.orgText) descEl.innerHTML = descEl.dataset.orgText;
+    });
+
     if (!query) {
         filterMenu('all');
         return;
@@ -186,6 +206,15 @@ function performSearch(query) {
         });
     }
 
+    // Helper to highlight matching text
+    function highlightString(text, kw) {
+        if (!kw) return text;
+        var esc = kw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        return text.replace(new RegExp(esc, 'gi'), function(m) {
+            return '<mark style="background:#fff59d; padding:0 2px; border-radius:2px; color:#333;">' + m + '</mark>';
+        });
+    }
+
     // Filter menu items
     var matchedCount = 0;
     var wrappers = document.querySelectorAll('.mwrap');
@@ -201,6 +230,12 @@ function performSearch(query) {
             w.style.opacity = '1';
             w.style.transform = 'translateY(0)';
             matchedCount++;
+
+            // Highlight keyword
+            var titEl = card.querySelector('.mtit');
+            var descEl = card.querySelector('.mdesc');
+            if (titEl) titEl.innerHTML = highlightString(titEl.innerHTML, query);
+            if (descEl) descEl.innerHTML = highlightString(descEl.innerHTML, query);
         } else {
             w.classList.add('gone');
         }
@@ -214,6 +249,11 @@ function performSearch(query) {
     }
 
     if (matchedCount === 0) {
+        // GA4 tracking: search_zero_results (Zero results search)
+        gtag('event', 'search_zero_results', {
+            'search_term': query
+        });
+
         var msgHtml = document.createElement('div');
         msgHtml.id = 'searchNoResultsMsg';
         msgHtml.className = 'col-12 text-center py-5';
@@ -237,6 +277,14 @@ window.resetSearch = function() {
         existingMsg.remove();
     }
     
+    // Restore original text first (remove highlights)
+    document.querySelectorAll('.mcard').forEach(function(card) {
+        var titEl = card.querySelector('.mtit');
+        var descEl = card.querySelector('.mdesc');
+        if (titEl && titEl.dataset.orgText) titEl.innerHTML = titEl.dataset.orgText;
+        if (descEl && descEl.dataset.orgText) descEl.innerHTML = descEl.dataset.orgText;
+    });
+
     // Clear query parameter from URL
     var newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
     window.history.pushState({ path: newUrl }, '', newUrl);
@@ -401,6 +449,14 @@ $(document).ready(function() {
 
 
 function filterMenu(cat) {
+    // Restore original text (remove highlights)
+    document.querySelectorAll('.mcard').forEach(function(card) {
+        var titEl = card.querySelector('.mtit');
+        var descEl = card.querySelector('.mdesc');
+        if (titEl && titEl.dataset.orgText) titEl.innerHTML = titEl.dataset.orgText;
+        if (descEl && descEl.dataset.orgText) descEl.innerHTML = descEl.dataset.orgText;
+    });
+
     // Clear search input and messages if filtering from non-search source
     var existingMsg = document.getElementById('searchNoResultsMsg');
     if (existingMsg) {
