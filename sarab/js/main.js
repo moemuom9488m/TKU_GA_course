@@ -157,6 +157,14 @@ document.querySelectorAll('.sovtrend .ttag').forEach(function(t) {
 // Perform closed search on local menu items
 function performSearch(query) {
     query = query.trim().toLowerCase();
+    
+    // Update URL query parameter without page reload
+    var newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+    if (query) {
+        newUrl += '?q=' + encodeURIComponent(query);
+    }
+    window.history.pushState({ path: newUrl }, '', newUrl);
+
     if (!query) {
         filterMenu('all');
         return;
@@ -228,6 +236,10 @@ window.resetSearch = function() {
     if (existingMsg) {
         existingMsg.remove();
     }
+    
+    // Clear query parameter from URL
+    var newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+    window.history.pushState({ path: newUrl }, '', newUrl);
     
     filterMenu('all');
 };
@@ -360,6 +372,18 @@ document.addEventListener('DOMContentLoaded', function() {
             sSug.style.display = 'none';
         }
     });
+
+    // Handle URL query parameter ?q= on page load
+    var urlParams = new URLSearchParams(window.location.search);
+    var qParam = urlParams.get('q');
+    if (qParam) {
+        if (sInput) sInput.value = qParam;
+        
+        // Wait a small delay to let page animations and DOM settle
+        setTimeout(function() {
+            performSearch(qParam);
+        }, 600);
+    }
 });
 
 
