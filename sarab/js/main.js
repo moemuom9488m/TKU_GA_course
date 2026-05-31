@@ -145,12 +145,110 @@ document.querySelectorAll('.sovcat').forEach(function(btn) {
     });
 });
 
-// Trending tags fill the search input
+// Trending tags fill the search input and trigger search
 document.querySelectorAll('.sovtrend .ttag').forEach(function(t) {
     t.addEventListener('click', function() {
-        document.getElementById('searchInput').value = this.textContent.trim();
-        document.getElementById('searchInput').focus();
+        var q = this.textContent.trim();
+        document.getElementById('searchInput').value = q;
+        performSearch(q);
     });
+});
+
+// Perform closed search on local menu items
+function performSearch(query) {
+    query = query.trim().toLowerCase();
+    if (!query) {
+        filterMenu('all');
+        return;
+    }
+
+    // GA4 tracking: view_search_results
+    gtag('event', 'view_search_results', {
+        'search_term': query
+    });
+
+    closeSearch();
+
+    // Scroll to menu
+    var menuSec = document.getElementById('menu');
+    if (menuSec) {
+        window.scrollTo({
+            top: menuSec.offsetTop - 78,
+            behavior: 'smooth'
+        });
+    }
+
+    // Filter menu items
+    var matchedCount = 0;
+    var wrappers = document.querySelectorAll('.mwrap');
+    wrappers.forEach(function(w) {
+        var card = w.querySelector('.mcard');
+        if (!card) return;
+        var title = card.getAttribute('data-title').toLowerCase();
+        var desc = card.getAttribute('data-desc').toLowerCase();
+        var cat = card.getAttribute('data-cat').toLowerCase();
+        
+        if (title.indexOf(query) !== -1 || desc.indexOf(query) !== -1 || cat.indexOf(query) !== -1) {
+            w.classList.remove('gone');
+            w.style.opacity = '1';
+            w.style.transform = 'translateY(0)';
+            matchedCount++;
+        } else {
+            w.classList.add('gone');
+        }
+    });
+
+    // Handle "No results found"
+    var mgrid = document.getElementById('mgrid');
+    var existingMsg = document.getElementById('searchNoResultsMsg');
+    if (existingMsg) {
+        existingMsg.remove();
+    }
+
+    if (matchedCount === 0) {
+        var msgHtml = document.createElement('div');
+        msgHtml.id = 'searchNoResultsMsg';
+        msgHtml.className = 'col-12 text-center py-5';
+        msgHtml.innerHTML = `
+            <div style="font-size: 3rem; color: #ccc; margin-bottom: 15px;"><i class="fas fa-search-minus"></i></div>
+            <h4 style="color: var(--dark); font-weight: 700;">No items found for "${query}"</h4>
+            <p style="color: #666; font-size: 0.92rem;">Try searching for other keywords (e.g. burger, pizza, chicken, wraps, pasta, desserts)</p>
+            <button class="btn-red mt-3" onclick="resetSearch()"><i class="fas fa-undo me-2"></i>Show All Items</button>
+        `;
+        mgrid.appendChild(msgHtml);
+    }
+}
+
+// Reset search input and show all
+window.resetSearch = function() {
+    var searchInput = document.getElementById('searchInput');
+    if (searchInput) searchInput.value = '';
+    
+    var existingMsg = document.getElementById('searchNoResultsMsg');
+    if (existingMsg) {
+        existingMsg.remove();
+    }
+    
+    filterMenu('all');
+};
+
+// Bind search button and input enter key
+document.addEventListener('DOMContentLoaded', function() {
+    var sInput = document.getElementById('searchInput');
+    var sBtn = document.querySelector('.sovinput button');
+    
+    if (sBtn && sInput) {
+        sBtn.addEventListener('click', function() {
+            performSearch(sInput.value);
+        });
+    }
+    if (sInput) {
+        sInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                performSearch(this.value);
+            }
+        });
+    }
 });
 
 
@@ -168,6 +266,12 @@ $(document).ready(function() {
 
 
 function filterMenu(cat) {
+    // Clear search input and messages if filtering from non-search source
+    var existingMsg = document.getElementById('searchNoResultsMsg');
+    if (existingMsg) {
+        existingMsg.remove();
+    }
+
     // GA4 tracking: select_content
     gtag('event', 'select_content', {
         'content_type': 'menu_category',
