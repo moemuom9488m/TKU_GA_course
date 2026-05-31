@@ -232,23 +232,134 @@ window.resetSearch = function() {
     filterMenu('all');
 };
 
-// Bind search button and input enter key
+// Add suggestions styles dynamically
+var suggestionsStyle = document.createElement('style');
+suggestionsStyle.innerHTML = `
+#searchSuggestions {
+    background: rgba(26, 26, 26, 0.98);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
+    margin-top: 8px;
+    max-height: 220px;
+    overflow-y: auto;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    display: none;
+    text-align: left;
+}
+.suggestion-item {
+    padding: 12px 20px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.suggestion-item:last-child {
+    border-bottom: none;
+}
+.suggestion-item:hover {
+    background: var(--primary);
+    padding-left: 26px;
+}
+.suggestion-item .sug-cat {
+    font-size: 0.76rem;
+    color: var(--secondary);
+    background: rgba(246, 166, 35, 0.15);
+    padding: 2px 8px;
+    border-radius: 10px;
+    text-transform: uppercase;
+}
+.suggestion-item:hover .sug-cat {
+    color: #fff;
+    background: rgba(255,255,255,0.25);
+}
+`;
+document.head.appendChild(suggestionsStyle);
+
+// Bind search button, input enter key, and suggestions logic
 document.addEventListener('DOMContentLoaded', function() {
     var sInput = document.getElementById('searchInput');
     var sBtn = document.querySelector('.sovinput button');
+    var sSug = document.getElementById('searchSuggestions');
     
+    // Bind click search button
     if (sBtn && sInput) {
         sBtn.addEventListener('click', function() {
+            if (sSug) sSug.style.display = 'none';
             performSearch(sInput.value);
         });
     }
+
+    // Bind input field events
     if (sInput) {
+        // Hitting enter
         sInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
+                if (sSug) sSug.style.display = 'none';
                 performSearch(this.value);
             }
         });
+
+        // Autocomplete suggestions
+        sInput.addEventListener('input', function() {
+            var val = this.value.trim().toLowerCase();
+            if (!sSug) return;
+
+            if (!val) {
+                sSug.innerHTML = '';
+                sSug.style.display = 'none';
+                return;
+            }
+
+            // Extract items dynamically from DOM cards to match
+            var menuItems = [];
+            document.querySelectorAll('.mcard').forEach(function(card) {
+                var title = card.getAttribute('data-title');
+                var cat = card.getAttribute('data-cat');
+                if (title && menuItems.map(function(item) { return item.title; }).indexOf(title) === -1) {
+                    menuItems.push({ title: title, category: cat });
+                }
+            });
+
+            // Filter
+            var matches = menuItems.filter(function(item) {
+                return item.title.toLowerCase().indexOf(val) !== -1 || 
+                       item.category.toLowerCase().indexOf(val) !== -1;
+            });
+
+            if (matches.length === 0) {
+                sSug.innerHTML = '';
+                sSug.style.display = 'none';
+                return;
+            }
+
+            // Render matching suggestions
+            sSug.innerHTML = '';
+            matches.forEach(function(item) {
+                var itemDiv = document.createElement('div');
+                itemDiv.className = 'suggestion-item';
+                itemDiv.innerHTML = '<span>' + item.title + '</span><span class="sug-cat">' + item.category + '</span>';
+                itemDiv.addEventListener('click', function() {
+                    sInput.value = item.title;
+                    sSug.style.display = 'none';
+                    sSug.innerHTML = '';
+                    performSearch(item.title);
+                });
+                sSug.appendChild(itemDiv);
+            });
+            sSug.style.display = 'block';
+        });
     }
+
+    // Close suggestions on outside click
+    document.addEventListener('click', function(e) {
+        if (sSug && sInput && e.target !== sInput && e.target !== sSug && !sSug.contains(e.target)) {
+            sSug.style.display = 'none';
+        }
+    });
 });
 
 
