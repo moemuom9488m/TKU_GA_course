@@ -575,6 +575,11 @@
          once: true
       });
 
+      // --- GOOGLE SHEETS CONFIGURATION ---
+      // 如果您想將訂單資料儲存至 Google 試算表，請在下方貼上您的 Google Apps Script 部署網址 (Web App URL)
+      // 例如：'https://script.google.com/macros/s/XXXXXX/exec'
+      var GOOGLE_SCRIPT_URL = '';
+
       // Cart helpers
       function getCart() {
          try {
@@ -814,6 +819,36 @@
             tax: parseFloat(computedTax.toFixed(2)),
             items: items
          });
+
+         // Save to Google Sheets if URL is configured
+         if (GOOGLE_SCRIPT_URL) {
+            var name = document.getElementById('billingName').value.trim();
+            var phone = document.getElementById('billingPhone').value.trim();
+            var email = document.getElementById('billingEmail').value.trim();
+            var notes = document.getElementById('billingNotes').value.trim();
+            
+            fetch(GOOGLE_SCRIPT_URL, {
+               method: 'POST',
+               mode: 'no-cors',
+               headers: {
+                  'Content-Type': 'application/json'
+               },
+               body: JSON.stringify({
+                  timestamp: new Date().toLocaleString(),
+                  orderId: orderId,
+                  name: name,
+                  phone: phone,
+                  email: email,
+                  address: address,
+                  paymentMethod: currentPaymentMethod,
+                  items: cart.map(function(item) { return item.title + ' (x' + item.quantity + ')'; }).join(', '),
+                  totalPrice: computedTotal.toFixed(2),
+                  notes: notes
+               })
+            }).catch(function(err) {
+               console.error("Google Sheets saving failed", err);
+            });
+         }
       }
 
       function clearAndGoHome() {
