@@ -75,7 +75,7 @@
 
 ## 🏆 第四階段：GA4 除錯與數據分析報表
 
-- [ ] **4-1. 使用 GA4 DebugView 工具進行即時除錯**
+- [x] **4-1. 使用 GA4 DebugView 工具進行即時除錯**
   - 安裝 Chrome 外掛 `Google Analytics Debugger` 或在網址後加上 `?gtag_debug=1`。
   - **💡 本地端 Debug 秘訣**：若在 `localhost` 除錯，可在 `index.html` 的 gtag 設定中加入以下設定，防範 Cookie 阻擋：
     ```javascript
@@ -89,6 +89,21 @@
     1. `page_view` (進入首頁)
     2. `scroll` (滾動到預約表單區塊，或點擊導覽列 Table Reservation)
     3. `generate_lead` (成功送出預約表單)
+
+---
+
+## 🚀 第五階段：進階功能擴充與資料庫連線 (實戰成果)
+
+- [x] **5-1. 購物車持久化與結帳流程**
+  - 使用 `localStorage` 保存購物車項目，並實作獨立結帳頁面 `checkout.html` 與模擬出貨動畫。
+- [x] **5-2. Google Sheets 後端資料庫連線**
+  - 利用 Google Apps Script Web App 將顧客訂單資料（姓名、地址、電話、明細）即時寫入 Google 試算表。
+- [x] **5-3. 封閉式站內搜尋與自動建議選單**
+  - 實作搜尋欄關鍵字自動比對菜單，並提供質感模糊比對下拉選單（一鍵定位）。
+- [x] **5-4. 網址參數深度連結 (?q=)**
+  - 搜尋時網址列同步更新為 `?q=關鍵字`，且能透過該 URL 載入時直接觸發自動搜尋。
+- [x] **5-5. 整合型 GA4 電子商務與搜尋事件**
+  - 實作並驗證 `begin_checkout`、`purchase` (購買) 以及 `view_search_results` (站內搜尋) 的 GA4 事件發送。
 
 ---
 
